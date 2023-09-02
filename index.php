@@ -15,7 +15,7 @@
     <?php include 'includes/header.php'; ?>
     <div class="content">
 
-        <?php include 'pages/home.php'; ?>
+        <?php include 'page/home.php'; ?>
         <?php include 'includes/cart.php'; ?>
 
     </div>

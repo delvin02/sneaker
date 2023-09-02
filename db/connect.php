@@ -1,19 +1,38 @@
 <?php
-$servername = "localhost";
-$username = "root";        // Change this if you've set a different MySQL username
-$password = "";            // Change this if you've set a different MySQL password
-$dbname = "ecommerce"; // Replace with the name of your created database
+error_reporting(E_ALL);
+
+$servername = "127.0.0.1";
+$username = "lucid";        
+$password = "password";            
+$dbname = "ecommerce"; 
 
 // Create a connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$sql = "DROP DATABASE IF EXISTS $dbname";
+if ($conn->query($sql) === TRUE) {
+    echo "Database dropped successfully.\n";
+} else {
+    echo "Error dropping database: " . $conn->error . "\n";
+}
+
+// Create the database
+$sql = "CREATE DATABASE $dbname";
+if ($conn->query($sql) === TRUE) {
+    echo "Database created successfully.\n";
+} else {
+    echo "Error creating database: " . $conn->error . "\n";
+}
+
+$conn->select_db($dbname);
+
 $sql = "
-     CREATE TABLE Category (
+    CREATE TABLE Category (
         CategoryId INT PRIMARY KEY,
         CategoryName VARCHAR(100) NOT NULL
     );
@@ -35,7 +54,7 @@ $sql = "
         Email VARCHAR(100) NOT NULL
     );
 
-    CREATE TABLE Order (
+    CREATE TABLE Orders (
         OrderId INT PRIMARY KEY,
         UserId INT,
         OrderDate DATE NOT NULL,
@@ -49,18 +68,22 @@ $sql = "
         ProductId INT,
         Quantity INT NOT NULL,
         Subtotal DECIMAL(10, 2) NOT NULL,
-        FOREIGN KEY (OrderId) REFERENCES Order(OrderId),
+        FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
         FOREIGN KEY (ProductId) REFERENCES Product(ProductId)
     );
 ";
 
-if ($conn->multi_query($sql) === TRUE)
-{
-    echo "Tables created successfully <br>";
-}
-else {
-    echo "Error creating tables: ", $conn->error . "<br>";
-}
+if ($conn->multi_query($sql) === TRUE) {
+    do {
+        // Check if the current statement returned a result set
+        if ($result = $conn->store_result()) {
+            $result->free(); // Free the result set
+        }
+    } while ($conn->more_results() && $conn->next_result());
 
+    echo "Tables 'ecommerce' created successfully.";
+} else {
+    echo "Error creating tables: " . $conn->error;
+}
 $conn->close();
 ?>
