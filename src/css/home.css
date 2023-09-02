@@ -1,0 +1,3 @@
+.group:focus-within .hidden {
+  display: block;
+}

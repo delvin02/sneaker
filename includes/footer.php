@@ -1,4 +1,4 @@
-<footer class="bg-white lg:grid lg:grid-cols-5">
+<footer class="bg-white lg:grid lg:grid-cols-5 border-t border-black">
   <div class="relative block h-32 lg:col-span-2 lg:h-full">
     <img
       src="src/images/sneakers-footer.jpeg"

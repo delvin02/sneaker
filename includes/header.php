@@ -9,6 +9,7 @@
           type="button"
           class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900"
           aria-expanded="false"
+          onclick="toggleDropdown()"
         >
           Menu
           <svg
@@ -25,8 +26,8 @@
           </svg>
         </button>
 
-        <div
-          class="hidden -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5"
+        <div id="menuDropdown"
+          class="hidden -left-8 top-full z-10 mt-3 w-screen max-w-md absolute overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5"
         >
           <div class="p-4">
             <div
@@ -35,33 +36,15 @@
               <div
                 class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white"
               >
-                <svg
-                  class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
-                  />
-                </svg>
+                <i class="h-6 w-6 text-gray-600 group-hover:text-indigo-600" data-feather="home"></i>
               </div>
               <div class="flex-auto">
-                <a href="#" class="block font-semibold text-gray-900">
-                  Analytics
+                <a href="index.php" class="block font-semibold text-gray-900">
+                  Home
                   <span class="absolute inset-0"></span>
                 </a>
                 <p class="mt-1 text-gray-600">
-                  Get a better understanding of your traffic
+                  trending sneakers
                 </p>
               </div>
             </div>
@@ -71,89 +54,26 @@
               <div
                 class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white"
               >
-                <svg
-                  class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
+
+
+                <svg class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
                   aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"
-                  />
+                  >
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M2.7,9.45a4.235,4.235,0,0,0,.3.3V22a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V9.752a4.235,4.235,0,0,0,.3-.3,4,4,0,0,0,.731-3.456L20.97,1.758A1,1,0,0,0,20,1H4a1,1,0,0,0-.97.758L1.972,5.994A4,4,0,0,0,2.7,9.45ZM13,21H11V16h2Zm6,0H15V15a1,1,0,0,0-1-1H10a1,1,0,0,0-1,1v6H5V10.9A3.989,3.989,0,0,0,8.914,9.61c.026.03.053.059.08.089A4.086,4.086,0,0,0,12.041,11a4.039,4.039,0,0,0,2.965-1.3c.027-.03.054-.059.08-.089A3.989,3.989,0,0,0,19,10.9ZM3.911,6.479,4.781,3H19.219l.87,3.479A2.029,2.029,0,0,1,18.12,9,2.041,2.041,0,0,1,16.1,7.14l-.042-.5a1,1,0,0,0-1.993.166v0a2.006,2.006,0,0,1-.529,1.539A2.059,2.059,0,0,1,11.959,9,2.029,2.029,0,0,1,9.937,6.806v0a1,1,0,0,0-.914-1.079.989.989,0,0,0-1.079.913l-.042.5A2.041,2.041,0,0,1,5.88,9,2.029,2.029,0,0,1,3.911,6.479Z"></path></g>
                 </svg>
               </div>
               <div class="flex-auto">
                 <a href="#" class="block font-semibold text-gray-900">
-                  Engagement
+                  Marketplace
                   <span class="absolute inset-0"></span>
                 </a>
                 <p class="mt-1 text-gray-600">
-                  Speak directly to your customers
+                  buy sneakers
                 </p>
-              </div>
-            </div>
-            <div
-              class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
-            >
-              <div
-                class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white"
-              >
-                <svg
-                  class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33"
-                  />
-                </svg>
-              </div>
-              <div class="flex-auto">
-                <a href="#" class="block font-semibold text-gray-900">
-                  Security
-                  <span class="absolute inset-0"></span>
-                </a>
-                <p class="mt-1 text-gray-600">
-                  Your customers’ data will be safe and secure
-                </p>
-              </div>
-            </div>
-            <div
-              class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
-            >
-              <div
-                class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white"
-              >
-                <svg
-                  class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z"
-                  />
-                </svg>
-              </div>
-              <div class="flex-auto">
-                <a href="#" class="block font-semibold text-gray-900">
-                  Integrations
-                  <span class="absolute inset-0"></span>
-                </a>
-                <p class="mt-1 text-gray-600">Connect with third-party tools</p>
               </div>
             </div>
             <div
@@ -179,7 +99,7 @@
               </div>
               <div class="flex-auto">
                 <a href="#" class="block font-semibold text-gray-900">
-                  Automations
+                  About Us
                   <span class="absolute inset-0"></span>
                 </a>
                 <p class="mt-1 text-gray-600">
@@ -205,7 +125,7 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              Watch demo
+              Admin
             </a>
             <a
               href="#"
@@ -266,7 +186,7 @@
       </a>
     </div>
     <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-      <a href="#" class="text-sm font-semibold leading-6 text-gray-900"
+      <a href="auth.php" class="text-sm font-semibold leading-6 text-gray-900"
         >Log in <span aria-hidden="true">&rarr;</span></a
       >
     </div>
@@ -395,7 +315,7 @@
           </div>
           <div class="py-6">
             <a
-              href="#"
+              href="auth.php"
               class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
               >Log in</a
             >
@@ -405,3 +325,10 @@
     </div>
   </div>
 </header>
+
+<script>
+  function toggleDropdown() {
+      var dropdown = document.getElementById("menuDropdown");
+      dropdown.classList.toggle("hidden");
+   }
+</script>

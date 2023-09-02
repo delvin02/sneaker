@@ -28,7 +28,7 @@
       <div class="my-4 w-full">
         <div class="flex mt-8 justify-between sticky top-1">
             <h1 class="text-3xl my-auto "> latest <span class="text-red-400">releases</span>./</h1>
-            <a class=" px-2 my-auto underline">See more > </a>
+            <a href="index.php?page=products" class=" px-2 my-auto underline">See more > </a>
         </div>
 
         <ul class="grid grid-cols-5 gap-10 mt-2">
@@ -86,7 +86,7 @@
       <div class="my-6 w-full">
         <div class="flex mt-8 justify-between">
           <h1 class="text-3xl my-auto"> hype <span class="text-red-400">NOW</span>./</h1>
-          <a class=" px-2 my-auto underline">See more > </a>
+          <a href="index.php?page=products" class=" px-2 my-auto underline">See more > </a>
         </div>
         <ul class="grid grid-cols-5 gap-10 mt-2">
           <li>
