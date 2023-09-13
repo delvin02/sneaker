@@ -1,4 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
+
+<?php
+ob_start();
+?>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -127,13 +131,18 @@
                 class="relative flex flex-col items-center justify-center rounded-t-[30px] bg-white px-5 py-8 text-black dark:bg-black dark:text-white md:rounded-none md:px-6"
             >
                 <?php
+                session_start();
+                if (isset($_SESSION) && !empty($_SESSION['user_id'])){
+                    header("Location: index.php");
+                }
                 // Check the query parameter to determine the content
                 $page = isset($_GET['page']) ? $_GET['page'] : '';
 
                 // Include the appropriate PHP content based on the query parameter
                 if ($page === 'register') {
                     include 'includes/register.php';
-                } else {
+                }
+                else {
                     include 'includes/login.php';
                 }
                 ?>

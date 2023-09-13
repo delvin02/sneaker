@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 <html>
 <head>
@@ -12,6 +14,14 @@
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 </head>
 <body>
+    <?php 
+      session_start();
+
+      $name = "guest";
+      if (!empty($_SESSION['user_id'])){
+        $name = $_SESSION['FirstName'];
+      }
+    ?>
     <?php include 'includes/banner.php'; ?>
 
     <?php include 'includes/header.php'; ?>

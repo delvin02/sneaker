@@ -7,7 +7,7 @@ $password = "password";
 $dbname = "ecommerce"; 
 
 // Create a connection
-$conn = new mysqli($servername, $username, $password);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
@@ -44,14 +44,16 @@ $sql = "
         Price DECIMAL(10, 2) NOT NULL,
         StockQuantity INT NOT NULL,
         CategoryId INT,
+        ImageFile varchar(255) NOT NULL,
         FOREIGN KEY (CategoryId) REFERENCES Category(CategoryId)
     );
 
     CREATE TABLE User (
-        UserId INT PRIMARY KEY,
-        FirstName VARCHAR(50) NOT NULL,
-        LastName VARCHAR(50) NOT NULL,
-        Email VARCHAR(100) NOT NULL
+        UserId INT PRIMARY KEY AUTO_INCREMENT,
+        Email VARCHAR(100) NOT NULL,
+        Password VARCHAR(255) NOT NULL,
+        FirstName VARCHAR(100) NOT NULL,
+        LastName VARCHAR(100) NOT NULL
     );
 
     CREATE TABLE Orders (
@@ -84,6 +86,28 @@ if ($conn->multi_query($sql) === TRUE) {
     echo "Tables 'ecommerce' created successfully.";
 } else {
     echo "Error creating tables: " . $conn->error;
+}
+
+
+// POPULATING DEFAULT USER
+$userName= "weei.khor@student.tafesa.edu.au";
+$userPassword = "password";
+
+$FirstName = "Florence";
+$LastName = "Li";
+
+$hashedPassword = password_hash($userPassword, PASSWORD_DEFAULT);
+
+$stmt = $conn->prepare("INSERT INTO User (Email, Password, FirstName, LastName) VALUES (?, ?, ?, ?)");
+
+$stmt->bind_param("ssss", $userName, $hashedPassword, $FirstName, $LastName);
+if ($stmt->execute())
+{
+    echo "User added succesfully";
+}
+else
+{
+    echo "Error adding user: ". $stmt-> error;
 }
 $conn->close();
 ?>

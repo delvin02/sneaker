@@ -1,8 +1,9 @@
-<section>
-    <div class="max-w-screen-xl px-4 py-8 mx-auto sm:px-6 sm:py-12 lg:px-8">
+
+<section">
+    <div class="border-x border-black max-w-screen-xl px-4 py-8 mx-auto sm:px-6 sm:py-12 lg:px-8">
       <header class="text-center">
         <h2 class="text-xl font-bold text-gray-900 sm:text-3xl">
-        Welcome, guest
+        Welcome, <?php echo $name ?>
         </h2>
   
         <p class="max-w-md mx-auto mt-4 text-gray-500">
