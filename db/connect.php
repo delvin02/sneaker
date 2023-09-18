@@ -1,4 +1,7 @@
 <?php
+
+require_once('../includes/utils.php');
+
 error_reporting(E_ALL);
 
 $servername = "127.0.0.1";
@@ -109,5 +112,19 @@ else
 {
     echo "Error adding user: ". $stmt-> error;
 }
+
+$categories = ['Nike', 'Yeezy', 'Air Jordan', 'Adidas'];
+
+
+foreach ($categories as $categoryName) {
+    $category->createCategory($categoryName);
+}
+
+$products = [
+    ['NIKE SB DUNK LOW “MUMMY”', 'Description for NIKE SB DUNK LOW “MUMMY”', 129.99, 50, 1, 'src/images/sneakers/mummy.png'],
+    ['Yeezy boost 750', 'Description for Yeezy boost 750', 199.99, 30, 2, 'src/images/sneakers/sneaker1.png'],
+    ['Air Jordan University Blue', 'Description for Air Jordan University Blue', 179.99, 40, 3, 'src/images/sneakers/sneaker2.png'],
+    ['SB Dunk', 'Description for SB Dunk', 99.99, 60, 4, 'src/images/sneakers/dunk.png']
+];
 $conn->close();
 ?>

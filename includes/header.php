@@ -67,7 +67,7 @@
                 </svg>
               </div>
               <div class="flex-auto">
-                <a href="#" class="block font-semibold text-gray-900">
+                <a href="index.php?page=products" class="block font-semibold text-gray-900">
                   Marketplace
                   <span class="absolute inset-0"></span>
                 </a>
@@ -98,7 +98,7 @@
                 </svg>
               </div>
               <div class="flex-auto">
-                <a href="#" class="block font-semibold text-gray-900">
+                <a href="index.php?page=about" class="block font-semibold text-gray-900">
                   About Us
                   <span class="absolute inset-0"></span>
                 </a>
