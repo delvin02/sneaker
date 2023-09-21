@@ -1,4 +1,16 @@
 
+<?php
+require_once(__DIR__ . '/../includes/utils.php');
+
+
+$databaseConnection = new DatabaseConnection();
+
+$product = new Product($databaseConnection);
+
+$limitedProducts = $product->getProductsLimited(5);
+
+
+?>
 <section">
     <div class="border-x border-black max-w-screen-xl px-4 py-8 mx-auto sm:px-6 sm:py-12 lg:px-8">
       <header class="text-center">
@@ -15,7 +27,7 @@
           <img
                 src="src/images/sneaker-wallpaper.png"
                 alt=""
-                class="object-cover transition duration-500 aspect-auto group-hover:opacity-90"
+                class="object-cover transition duration-500 aspect-auto group-hover:opacity-90 lg:h-auto h-[480px]"
           >
           <div class="absolute inset-0 flex flex-col items-center justify-center p-6">
             <div class="my-10">
@@ -32,55 +44,25 @@
             <a href="index.php?page=products" class=" px-2 my-auto underline">See more > </a>
         </div>
 
-        <ul class="grid grid-cols-5 gap-10 mt-2">
-          <li>
-
-            <img
-            src="src/images/sneakers/mummy.png"
-                alt=""
-                class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90"
-              />
-              
-              <p class="text-center py-3">NIKE SB DUNK LOW “MUMMY”</p>        
-          </li>
-          
-          <li>
-            <img
-            src="src/images/sneakers/sneaker1.png"
-                alt=""
-                class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90"
-              />
-              <p class="text-center py-3">Yeezy boost 750</p>        
-
-          </li>
-          
-          <li>
-            <img
-            src="src/images/sneakers/sneaker2.png"
-                alt=""
-                class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90"
-              />
-              <p class="text-center py-3">Air Jordan University Blue</p>        
-
-          </li>
-          <li>
-            <img
-            src="src/images/sneakers/dunk.png"
-                alt=""
-                class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90"
-              />
-              <p class="text-center py-3">SB Dunk</p>        
-
-          </li>
-          <li>
-            <img
-                src="src/images/sneakers/sneaker2.png"
-                alt=""
-                class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90"
-              />
-              <p class="text-center py-3">Air Jordan University Blue</p>        
-
-          </li>
+        <ul class="grid lg:grid-cols-5 lg:gap-10 mt-2 grid-cols-2 gap-2">
+            <?php foreach ($limitedProducts as $product): ?>
+              <li class="flex">
+                <a href="" class="flex flex-col justify-between text-center">
+                  <img
+                      src="<?php echo $product['ImageFile']; ?>"
+                      alt=""
+                      class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90 lg:h-[211px] h-auto"
+                  />
+                  <div class="mt-3">
+                    <div class="flex flex-col justify-between text-left mt-2 h-full"> <!-- Fixed height for product name -->
+                      <p class="text-sm text-gray-500"><?php echo $product['CategoryName']; ?></p>
+                      <p class="text-sm h-[40px]"><?php echo $product['ProductName']; ?></p>
+                      <p class="text-lg font-bold">A$<?php echo $product['Price']; ?></p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            <?php endforeach; ?>
           
         </ul>
       </div>

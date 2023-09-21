@@ -7,8 +7,13 @@ class DatabaseConnection {
     private $dbname;
     private $conn;
 
-    public function __construct($servername, $username, $password, $dbname)
-    {
+
+    public function __construct(
+        $servername = "127.0.0.1",
+        $username = "lucid",
+        $password = "password",
+        $dbname = "ecommerce"
+    ) {
         $this->servername = $servername;
         $this->username = $username;
         $this->password = $password;
@@ -68,6 +73,99 @@ class Category {
         }
     }
 
+    public function getCategoryIdByName($categoryName) {
+        $sql = "SELECT CategoryId FROM Category WHERE CategoryName = ?";
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("s", $categoryName);
+
+            if ($stmt->execute()) {
+                $stmt->bind_result($categoryId);
+
+                if ($stmt->fetch()) {
+                    // Close the statement
+                    $stmt->close();
+                    
+                    // Return the category ID found
+                    return $categoryId;
+                } else {
+                    // No matching category found
+                    $stmt->close();
+                    return null;
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+
+        return null;
+    }
+
+}
+
+class Product {
+    private $DatabaseConnection;
+
+    public function __construct($DatabaseConnection) {
+        $this->DatabaseConnection = $DatabaseConnection->getConnection();
+    }
+
+    public function createProduct($productName, $description, $price, $stockQuantity, $categoryId, $imageFile)
+    {
+        $sql = "INSERT INTO Product (ProductName, Description, Price, StockQuantity, CategoryId, ImageFile) VALUES (?, ?, ?, ?, ?, ?)";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("ssdiss", $productName, $description, $price, $stockQuantity, $categoryId, $imageFile);
+            
+            if ($stmt->execute()) {
+                echo "Product '$productName' created successfully. <br>";
+            } else {
+                echo "Error creating product: ". $stmt->error . "<br>";
+            }
+
+            $stmt->close();
+        } else
+        {
+            echo "Error preparing statement: " .$this->DatabaseConnection->error . "<br>";
+        }
+    }
+
+    public function getProductsLimited($limit = 5) {
+        $sql = "SELECT p.*, c.CategoryName 
+                FROM Product p
+                LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+                LIMIT ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $limit);
+            
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $products = [];
+
+                while ($row = $result->fetch_assoc()) {
+                    $products[] = $row;
+                }
+
+                return $products;
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+
+        return [];
+    }
 }
 class Cart {
     private $cartItems = [];

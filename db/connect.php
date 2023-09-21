@@ -2,20 +2,24 @@
 
 require_once('../includes/utils.php');
 
-error_reporting(E_ALL);
-
 $servername = "127.0.0.1";
-$username = "lucid";        
-$password = "password";            
-$dbname = "ecommerce"; 
+$username = "lucid";
+$password = "password";
+$dbname = "ecommerce";
 
-// Create a connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Create an instance of DatabaseConnection
+$databaseConnection = new DatabaseConnection($servername, $username, $password, $dbname);
+
+// Get the database connection
+$conn = $databaseConnection->getConnection();
+
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+
 
 $sql = "DROP DATABASE IF EXISTS $dbname";
 if ($conn->query($sql) === TRUE) {
@@ -36,12 +40,12 @@ $conn->select_db($dbname);
 
 $sql = "
     CREATE TABLE Category (
-        CategoryId INT PRIMARY KEY,
+        CategoryId INT AUTO_INCREMENT PRIMARY KEY,
         CategoryName VARCHAR(100) NOT NULL
     );
 
     CREATE TABLE Product (
-        ProductId INT PRIMARY KEY,
+        ProductId INT AUTO_INCREMENT PRIMARY KEY,
         ProductName VARCHAR(255) NOT NULL,
         Description TEXT,
         Price DECIMAL(10, 2) NOT NULL,
@@ -113,18 +117,46 @@ else
     echo "Error adding user: ". $stmt-> error;
 }
 
-$categories = ['Nike', 'Yeezy', 'Air Jordan', 'Adidas'];
+$databaseConnection = new DatabaseConnection($servername, $username, $password, $dbname);
+
+// Create instances of Category, Product, and Cart using the $databaseConnection
+$category = new Category($databaseConnection);
+$product = new Product($databaseConnection);
+$cart = new Cart($databaseConnection);
+
+$categories = ['Nike', 'Yeezy', 'Air Jordan', 'Adidas', 'Balenciaga', 'Balmain'];
 
 
 foreach ($categories as $categoryName) {
     $category->createCategory($categoryName);
 }
-
 $products = [
-    ['NIKE SB DUNK LOW “MUMMY”', 'Description for NIKE SB DUNK LOW “MUMMY”', 129.99, 50, 1, 'src/images/sneakers/mummy.png'],
-    ['Yeezy boost 750', 'Description for Yeezy boost 750', 199.99, 30, 2, 'src/images/sneakers/sneaker1.png'],
-    ['Air Jordan University Blue', 'Description for Air Jordan University Blue', 179.99, 40, 3, 'src/images/sneakers/sneaker2.png'],
-    ['SB Dunk', 'Description for SB Dunk', 99.99, 60, 4, 'src/images/sneakers/dunk.png']
+    ['3XL Panelled', 'Description for SB Dunk', 3242, 60, 'Balenciaga', 'src/images/sneakers/balenciaga.png'],
+    ['Unicorn low-top', 'Description for SB Dunk', 3242, 60, 'Balmain', 'src/images/sneakers/balmain-unicorn.png'],
+    ['Travis Scott Air Max 270 "Cactus Trails"', 'The sneaker upper features wavy cream synthetic overlays sitting atop the tonal mesh base while a brown nubuck toe cap with mini embroidered Swoosh branding adds contrast.', 8888, 60, 'Balenciaga', 'src/images/sneakers/travis-scott-cactus.png'],
+    ['SB DUNK LOW “MUMMY”', 'Description for NIKE SB DUNK LOW “MUMMY”', 129.99, 50, 'Nike', 'src/images/sneakers/mummy.png'],
+    ['Yeezy boost Oat', 'Description for Yeezy boost 750', 199.99, 30, 'Yeezy', 'src/images/sneakers/sneaker1.png'],
+    ['Air Jordan University Blue', 'Description for Air Jordan University Blue', 179.99, 40, 'Air Jordan', 'src/images/sneakers/sneaker2.png'],
+    ['SB Dunk', 'Description for SB Dunk', 99.99, 60, 'Adidas', 'src/images/sneakers/dunk.png'],
+    ['Nike Offwhite Vapormax Flyknit', 'Description for SB Dunk', 1000, 60, 'Nike', 'src/images/sneakers/nike-offwhite-vapormax.png']
 ];
+
+foreach ($products as $productData) {
+    list($productName, $description, $price, $stockQuantity, $categoryName, $imageFile) = $productData;
+    
+    // Retrieve the categoryId based on the categoryName
+    $categoryId = $category->getCategoryIdByName($categoryName);
+    
+    if ($categoryId !== null) {
+        // Create the product with the retrieved categoryId
+        $product->createProduct($productName, $description, $price, $stockQuantity, (int)$categoryId, $imageFile);
+    } else {
+        echo "Error: Category '$categoryName' does not exist.<br>";
+    }
+}
+
+
+$databaseConnection->closeConnection();
 $conn->close();
+
 ?>
