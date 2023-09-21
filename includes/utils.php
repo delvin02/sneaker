@@ -1,10 +1,12 @@
 <?php
 
-class DatabaseConnection {
+class DatabaseConnection
+{
     private $servername;
     private $username;
     private $password;
     private $dbname;
+    private $port;
     private $conn;
 
 
@@ -12,29 +14,32 @@ class DatabaseConnection {
         $servername = "127.0.0.1",
         $username = "lucid",
         $password = "password",
-        $dbname = "ecommerce"
+        $dbname = "ecommerce",
+        $port = 3307
     ) {
         $this->servername = $servername;
         $this->username = $username;
         $this->password = $password;
         $this->dbname = $dbname;
+        $this->port = $port;
         $this->connect();
     }
 
     public function connect()
     {
-        $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
-        if ($this->conn->connect_error)
-        {
+        $this->conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname, $this->port);
+        if ($this->conn->connect_error) {
             die("Connection failed: " . $this->conn->connect_error);
         }
     }
 
-    public function getConnection(){
+    public function getConnection()
+    {
         return $this->conn;
     }
 
-    public function closeConnection() {
+    public function closeConnection()
+    {
         if ($this->conn) {
             $this->conn->close();
         }
@@ -42,14 +47,17 @@ class DatabaseConnection {
 }
 
 // Database Class Helper
-class Category {
+class Category
+{
     private $DatabaseConnection;
 
-    public function __construct($DatabaseConnection) {
+    public function __construct($DatabaseConnection)
+    {
         $this->DatabaseConnection = $DatabaseConnection->getConnection();
     }
-    
-    public function createCategory($categoryName) {
+
+    public function createCategory($categoryName)
+    {
         $sql = "INSERT INTO Category (CategoryName) VALUES (?)";
 
         // Prepare the SQL statement
@@ -73,7 +81,8 @@ class Category {
         }
     }
 
-    public function getCategoryIdByName($categoryName) {
+    public function getCategoryIdByName($categoryName)
+    {
         $sql = "SELECT CategoryId FROM Category WHERE CategoryName = ?";
         $stmt = $this->DatabaseConnection->prepare($sql);
 
@@ -86,7 +95,7 @@ class Category {
                 if ($stmt->fetch()) {
                     // Close the statement
                     $stmt->close();
-                    
+
                     // Return the category ID found
                     return $categoryId;
                 } else {
@@ -106,10 +115,12 @@ class Category {
 
 }
 
-class Product {
+class Product
+{
     private $DatabaseConnection;
 
-    public function __construct($DatabaseConnection) {
+    public function __construct($DatabaseConnection)
+    {
         $this->DatabaseConnection = $DatabaseConnection->getConnection();
     }
 
@@ -121,21 +132,21 @@ class Product {
 
         if ($stmt) {
             $stmt->bind_param("ssdiss", $productName, $description, $price, $stockQuantity, $categoryId, $imageFile);
-            
+
             if ($stmt->execute()) {
                 echo "Product '$productName' created successfully. <br>";
             } else {
-                echo "Error creating product: ". $stmt->error . "<br>";
+                echo "Error creating product: " . $stmt->error . "<br>";
             }
 
             $stmt->close();
-        } else
-        {
-            echo "Error preparing statement: " .$this->DatabaseConnection->error . "<br>";
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
         }
     }
 
-    public function getProductsLimited($limit = 5) {
+    public function getProductsLimited($limit = 5)
+    {
         $sql = "SELECT p.*, c.CategoryName 
                 FROM Product p
                 LEFT JOIN Category c ON p.CategoryId = c.CategoryId
@@ -145,7 +156,7 @@ class Product {
 
         if ($stmt) {
             $stmt->bind_param("i", $limit);
-            
+
             if ($stmt->execute()) {
                 $result = $stmt->get_result();
                 $products = [];
@@ -167,7 +178,8 @@ class Product {
         return [];
     }
 }
-class Cart {
+class Cart
+{
     private $cartItems = [];
     private $DatabaseConnection;
 
@@ -180,11 +192,10 @@ class Cart {
     {
         $product = $this->getProductFromDatabase($productId);
 
-        if($product){
-            if (array_key_exists($productId, $this->cartItems))
-            {
+        if ($product) {
+            if (array_key_exists($productId, $this->cartItems)) {
                 $this->cartItems[$productId]['quantity'] += $quantity;
-            } else{
+            } else {
                 $this->cartItems[$productId] = [
                     'product' => $product,
                     'quantity' => $quantity,
@@ -197,8 +208,7 @@ class Cart {
 
     public function removeFromCart($productId)
     {
-        if (array_key_exists($productId, $this->cartItems))
-        {
+        if (array_key_exists($productId, $this->cartItems)) {
             unset($this->cartItems[$productId]);
             return true;
         }
@@ -215,14 +225,14 @@ class Cart {
     {
         $total = 0;
 
-        foreach($this->cartItems as $item)
-        {
+        foreach ($this->cartItems as $item) {
             $total += $item['product']['Price'] * $item['quantity'];
         }
         return $total;
     }
 
-    private function getProductFromDatabase($productId){
+    private function getProductFromDatabase($productId)
+    {
         $conn = $this->DatabaseConnection->getConnection();
 
         $stmt = $conn->prepare("SELECT * FROM Product WHERE ProductId = ?");
