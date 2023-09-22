@@ -6,7 +6,7 @@ $servername = "localhost";
 $username = "lucid";
 $password = "password";
 $dbname = "ecommerce";
-$port = 3307;
+$port = 3306;
 
 // Create an instance of DatabaseConnection
 $databaseConnection = new DatabaseConnection($servername, $username, $password, $dbname, $port);

@@ -15,7 +15,7 @@ class DatabaseConnection
         $username = "lucid",
         $password = "password",
         $dbname = "ecommerce",
-        $port = 3307
+        $port = 3306
     ) {
         $this->servername = $servername;
         $this->username = $username;

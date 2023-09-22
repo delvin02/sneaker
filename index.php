@@ -39,6 +39,9 @@
             include 'page/about.php';
         }elseif ($currentPage === 'products') {
             include 'page/products.php';
+        } elseif ($currentPage === 'product')
+        {
+          include 'page/product.php';
         }
         elseif ($currentPage === 'product_detail') {
             include 'page/product_detail.php';
