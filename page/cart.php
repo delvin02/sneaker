@@ -1,3 +1,62 @@
+<?php
+
+require_once(__DIR__ . '/../includes/utils.php');
+
+$databaseConnection = new DatabaseConnection();
+
+// Assuming you have a Product and Session class defined elsewhere
+$ProductSize = new ProductSize($databaseConnection);
+$CartItem = new CartItem($databaseConnection);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Retrieve product ID and size from the form
+  $productId = $_POST['productId'];
+  $size = $_POST['size'];
+
+  echo "Receiveda :" . $size . " " . $_SESSION['user_id'];
+
+  $user = $_SESSION['user_id'];
+
+  echo "ProductId " . $productId;
+  // Example: Fetch ProductSizeId based on the Size (You should have a method to do this)
+  $ProductSizeId = $ProductSize->getProductSizeIdIdBySizeAndProductId($size, $productId);
+
+  // Check if the product and size are valid and if the user is logged in.
+  if (!empty($ProductSizeId)) {
+    // Check if the product already exists in the cart for the user
+    $existingCartItem = $CartItem->getCartItemByUserProduct($user, $productId, $ProductSizeId, $size);
+
+    if (!empty($existingCartItem)) {
+      // Product already exists in the cart, so update the quantity
+      $newQuantity = $existingCartItem['Quantity'] + 1;
+      if ($CartItem->updateQuantity($existingCartItem['CartItemId'], $newQuantity)) {
+        //header('Location: ./index.php?page=cart.php'); // Redirect to the cart page
+        exit;
+      } else {
+        // Failed to update quantity
+        echo "Failed to update the quantity in the cart.";
+      }
+    } else {
+      echo "create";
+      // Product doesn't exist in the cart, create a new cart item
+      $quantity = 1; // You can set the quantity as needed
+      if ($CartItem->create($user, $productId, $ProductSizeId, $quantity)) {
+        // Cart item created successfully
+        //header('Location: cart.php'); // Redirect to the cart page
+        exit;
+      } else {
+        // Failed to create a cart item
+        echo "Failed to create a cart item.";
+      }
+    }
+  } else {
+    // Invalid data or user not logged in
+    echo "Invalid data or user not logged in.";
+  }
+}
+?>
+
+
 <div class="container mx-auto">
   <div class="flex">
     <div class="w-3/4 border-x border-black bg-white px-10 py-10">
@@ -25,22 +84,18 @@
         </div>
         <div class="flex justify-center w-1/5">
           <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-            <path
-              d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+            <path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
           </svg>
 
           <input class="mx-2 border text-center w-8" type="text" value="1">
 
           <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-            <path
-              d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+            <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
           </svg>
         </div>
         <span class="text-center w-1/5 font-semibold text-sm">$400.00</span>
         <span class="text-center w-1/5 font-semibold text-sm">$400.00</span>
-        <span class="text-center w-1/5 font-semibold text-sm"><button href="#"
-            class="font-semibold hover:text-red-500 text-gray-500 text-xs"><i
-              data-feather="trash-2"></i></button></a></span>
+        <span class="text-center w-1/5 font-semibold text-sm"><button href="#" class="font-semibold hover:text-red-500 text-gray-500 text-xs"><i data-feather="trash-2"></i></button></a></span>
       </div>
 
       <div class="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5">
@@ -55,29 +110,24 @@
         </div>
         <div class="flex justify-center w-1/5">
           <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-            <path
-              d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+            <path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
           </svg>
 
           <input class="mx-2 border text-center w-8" type="text" value="1">
 
           <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-            <path
-              d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+            <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
           </svg>
         </div>
         <span class="text-center w-1/5 font-semibold text-sm">$400.00</span>
         <span class="text-center w-1/5 font-semibold text-sm">$400.00</span>
-        <span class="text-center w-1/5 font-semibold text-sm"><button href="#"
-            class="font-semibold hover:text-red-500 text-gray-500 text-xs"><i
-              data-feather="trash-2"></i></button></a></span>
+        <span class="text-center w-1/5 font-semibold text-sm"><button href="#" class="font-semibold hover:text-red-500 text-gray-500 text-xs"><i data-feather="trash-2"></i></button></a></span>
       </div>
 
       <a href="index.php" class="flex font-semibold text-indigo-600 text-sm mt-10">
 
         <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512">
-          <path
-            d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
+          <path d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
         </svg>
         Continue Shopping
       </a>
@@ -105,8 +155,7 @@
           <span>Total cost</span>
           <span>$600</span>
         </div>
-        <button
-          class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
+        <button class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
       </div>
     </div>
 

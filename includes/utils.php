@@ -112,7 +112,6 @@ class Category
 
         return null;
     }
-
 }
 
 class Product
@@ -124,25 +123,60 @@ class Product
         $this->DatabaseConnection = $DatabaseConnection->getConnection();
     }
 
-    public function createProduct($productName, $description, $price, $stockQuantity, $categoryId, $imageFile)
+    public function createProduct($productName, $description, $price, $categoryId, $imageFile)
     {
-        $sql = "INSERT INTO Product (ProductName, Description, Price, StockQuantity, CategoryId, ImageFile) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO Product (ProductName, Description, Price, CategoryId, ImageFile) VALUES (?, ?, ?, ?, ?)";
 
         $stmt = $this->DatabaseConnection->prepare($sql);
 
         if ($stmt) {
-            $stmt->bind_param("ssdiss", $productName, $description, $price, $stockQuantity, $categoryId, $imageFile);
+            $stmt->bind_param("ssdss", $productName, $description, $price, $categoryId, $imageFile);
 
             if ($stmt->execute()) {
+                $productId = $stmt->insert_id;
                 echo "Product '$productName' created successfully. <br>";
+
+                $stmt->close();
+                return $productId;
             } else {
                 echo "Error creating product: " . $stmt->error . "<br>";
             }
-
-            $stmt->close();
         } else {
             echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
         }
+        return null;
+    }
+
+    // GETTERS
+    public function getProductById($id)
+    {
+        $sql = "SELECT p.*, c.CategoryName, ps.Size, ps.Quantity
+            FROM Product p
+            LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+            LEFT JOIN ProductSize ps on p.ProductId = ps.ProductId
+            WHERE p.ProductId = ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    $product = $result->fetch_assoc();
+                    return $product;
+                } else {
+                    return null;
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+        return null;
     }
 
     public function getProductsLimited($limit = 5)
@@ -177,76 +211,278 @@ class Product
 
         return [];
     }
+    public function searchProducts($query)
+    {
+        // Use a prepared statement to search for products based on the query
+        $sql = "SELECT p.*, c.CategoryName 
+            FROM Product p
+            LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+            WHERE (p.ProductName LIKE ? OR p.Description LIKE ? OR c.CategoryName LIKE ?)";
+
+        $query = "%$query%"; // Add wildcard characters to search for partial matches
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("sss", $query, $query, $query);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $products = [];
+
+                while ($row = $result->fetch_assoc()) {
+                    $products[] = $row;
+                }
+
+                return $products;
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+
+        return [];
+    }
 }
-class Cart
+
+class ProductSize
 {
-    private $cartItems = [];
     private $DatabaseConnection;
 
     public function __construct($DatabaseConnection)
     {
-        $this->DatabaseConnection = $DatabaseConnection;
+        $this->DatabaseConnection = $DatabaseConnection->getConnection();
     }
 
-    public function addToCart($productId, $quantity)
+    public function create($productId, $size, $quantity)
     {
-        $product = $this->getProductFromDatabase($productId);
+        $sql = "INSERT INTO ProductSize (ProductId, Size, Quantity) VALUES (?, ?, ?)";
+        $stmt = $this->DatabaseConnection->prepare($sql);
 
-        if ($product) {
-            if (array_key_exists($productId, $this->cartItems)) {
-                $this->cartItems[$productId]['quantity'] += $quantity;
+        if ($stmt) {
+            $stmt->bind_param("isi", $productId, $size, $quantity);
+            if ($stmt->execute()) {
+                return true;
             } else {
-                $this->cartItems[$productId] = [
-                    'product' => $product,
-                    'quantity' => $quantity,
-                ];
+                echo "Error inserting product size: " . $stmt->error;
             }
-            return true;
-        }
-        return false;
-    }
-
-    public function removeFromCart($productId)
-    {
-        if (array_key_exists($productId, $this->cartItems)) {
-            unset($this->cartItems[$productId]);
-            return true;
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error;
         }
 
         return false;
     }
 
-    public function getCartItems()
+    public function getProductById($productId)
     {
-        return $this->cartItems;
-    }
+        $sql = "SELECT * FROM ProductSize WHERE ProductId = ?";
 
-    public function calculateTotal()
-    {
-        $total = 0;
+        $stmt = $this->DatabaseConnection->prepare($sql);
 
-        foreach ($this->cartItems as $item) {
-            $total += $item['product']['Price'] * $item['quantity'];
+        if ($stmt) {
+            $stmt->bind_param("i", $productId);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+
+                if ($result->num_rows === 1) {
+                    // Return the first (and only) row as an associative array
+                    return $result->fetch_assoc();
+                } else {
+                    echo "No matching product size found for the given product and size.";
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
         }
-        return $total;
+
+        return null;
     }
 
-    private function getProductFromDatabase($productId)
+    public function getProductByIdAndSize($productId, $size)
     {
-        $conn = $this->DatabaseConnection->getConnection();
+        $sql = "SELECT * FROM ProductSize WHERE ProductId = ? AND Size = ?";
 
-        $stmt = $conn->prepare("SELECT * FROM Product WHERE ProductId = ?");
-        $stmt->bind_param("i", $productId);
-        $stmt->execute();
+        $stmt = $this->DatabaseConnection->prepare($sql);
 
-        $result = $stmt->get_result();
+        if ($stmt) {
+            $stmt->bind_param("ii", $productId, $size);
 
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+
+                if ($result->num_rows === 1) {
+                    // Return the first (and only) row as an associative array
+                    return $result->fetch_assoc();
+                } else {
+                    echo "No matching product size found for the given product and size.";
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+
+        return null;
+    }
+
+    public function getProductSizesByProductId($productId)
+    {
+        $sql = "SELECT Size FROM ProductSize WHERE ProductID = ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $productId);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $productSizes = array(); // Initialize an empty array
+
+                while ($row = $result->fetch_assoc()) {
+                    $productSizes[] = $row['Size']; // Add each size to the array
+                }
+
+                if (!empty($productSizes)) {
+                    return $productSizes;
+                } else {
+                    return null;
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+        return null;
+    }
+    public function getProductSizeIdIdBySizeAndProductId($size, $productId)
+    {
+        $sql = "SELECT ProductSizeId FROM ProductSize WHERE ProductId = ? AND Size = ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("is", $productId, $size);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    return $row['ProductSizeId'];
+                } else {
+                    return null; // Size not found for the given product
+                }
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
         }
         return null;
     }
 }
+class CartItem
+{
+    private $DatabaseConnection;
+    private $productSize;
 
+    public function __construct($DatabaseConnection)
+    {
+        $this->DatabaseConnection = $DatabaseConnection->getConnection();
+        $this->productSize = new ProductSize($DatabaseConnection); // Create an instance of ProductSize
 
-?>
+    }
+
+    public function getCartItemByUserProduct($userId, $productId, $productSizeId, $size)
+    {
+        $sql = "SELECT * FROM CartItem WHERE UserId = ? AND ProductId = ? AND ProductSizeId = ?";
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            // You need to fetch the ProductSizeId based on the provided size and productId
+            $ProductSize = $this->productSize->getProductByIdAndSize($productId, $size);
+
+            if (isset($ProductSize) && isset($ProductSize['ProductSizeId'])) {
+                $productSizeId = $ProductSize['ProductSizeId'];
+
+                $stmt->bind_param("iii", $userId, $productId, $productSizeId);
+
+                if ($stmt->execute()) {
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows === 1) {
+                        return $result->fetch_assoc();
+                    } else {
+                        // No matching cart item found
+                        return null;
+                    }
+                } else {
+                    echo "Error retrieving cart item: " . $stmt->error;
+                }
+            } else {
+                echo "Error: Product size not found for the given product and size.";
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error;
+        }
+
+        return null;
+    }
+
+    public function create($userId, $productId, $productSizeId, $quantity)
+    {
+        $sql = "INSERT INTO CartItem (UserId, ProductId, ProductSizeId, Quantity) VALUES (?, ?, ?, ?)";
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            // You need to fetch the ProductSizeId based on the provided size and productId
+
+            $stmt->bind_param("iiii", $userId, $productId, $productSizeId, $quantity);
+
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                echo "Error inserting cart item: " . $stmt->error;
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error;
+        }
+
+        return false;
+    }
+
+    public function updateQuantity($cartItemId, $newQuantity)
+    {
+        $sql = "UPDATE CartItem SET Quantity = ? WHERE CartItemId = ?";
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("ii", $newQuantity, $cartItemId);
+
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                echo "Error updating cart item quantity: " . $stmt->error;
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error;
+        }
+
+        return false;
+    }
+}

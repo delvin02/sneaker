@@ -39,6 +39,14 @@ if ($conn->query($sql) === TRUE) {
 $conn->select_db($dbname);
 
 $sql = "
+    CREATE TABLE User (
+        UserId INT PRIMARY KEY AUTO_INCREMENT,
+        Email VARCHAR(100) NOT NULL,
+        Password VARCHAR(255) NOT NULL,
+        FirstName VARCHAR(100) NOT NULL,
+        LastName VARCHAR(100) NOT NULL
+    );
+
     CREATE TABLE Category (
         CategoryId INT AUTO_INCREMENT PRIMARY KEY,
         CategoryName VARCHAR(100) NOT NULL
@@ -49,18 +57,30 @@ $sql = "
         ProductName VARCHAR(255) NOT NULL,
         Description TEXT,
         Price DECIMAL(10, 2) NOT NULL,
-        StockQuantity INT NOT NULL,
         CategoryId INT,
         ImageFile varchar(255) NOT NULL,
         FOREIGN KEY (CategoryId) REFERENCES Category(CategoryId)
     );
 
-    CREATE TABLE User (
-        UserId INT PRIMARY KEY AUTO_INCREMENT,
-        Email VARCHAR(100) NOT NULL,
-        Password VARCHAR(255) NOT NULL,
-        FirstName VARCHAR(100) NOT NULL,
-        LastName VARCHAR(100) NOT NULL
+        CREATE TABLE ProductSize (
+        ProductSizeId INT AUTO_INCREMENT PRIMARY KEY,
+        ProductId INT,
+        Size VARCHAR(10) NOT NULL,
+        Quantity INT NOT NULL,
+        FOREIGN KEY (ProductId) REFERENCES Product(ProductId)
+    );
+
+    
+    CREATE TABLE CartItem (
+        CartItemId INT AUTO_INCREMENT PRIMARY KEY,
+        UserId INT,
+        ProductId INT,
+        ProductSizeId INT,
+        Quantity INT NOT NULL,
+        FOREIGN KEY (UserId) REFERENCES User(UserId),
+        FOREIGN KEY (ProductId) REFERENCES Product(ProductId),
+        FOREIGN KEY (ProductSizeId) REFERENCES ProductSize(ProductSizeId)
+
     );
 
     CREATE TABLE Orders (
@@ -117,7 +137,7 @@ if ($stmt->execute()) {
 // Create instances of Category, Product, and Cart using the $databaseConnection
 $category = new Category($databaseConnection);
 $product = new Product($databaseConnection);
-$cart = new Cart($databaseConnection);
+$productSize = new ProductSize($databaseConnection);
 
 $categories = ['Nike', 'Yeezy', 'Air Jordan', 'Adidas', 'Balenciaga', 'Balmain', 'Nike x Off-White', 'Off-White', 'Nike x Tiffany & Co'];
 
@@ -126,27 +146,39 @@ foreach ($categories as $categoryName) {
     $category->createCategory($categoryName);
 }
 $products = [
-    ['3XL Panelled', 'Description for SB Dunk', 3242, 60, 'Balenciaga', 'src/images/sneakers/balenciaga.png'],
-    ['Unicorn low-top', 'Description for SB Dunk', 3242, 60, 'Balmain', 'src/images/sneakers/balmain-unicorn.png'],
-    ['Tiffany and Co Air Force 1 Low sneakers', "Nike teams up with iconic jewellery brand Tiffany & Co. to produce an eye-catching update to the classic Air Force 1 Low sneaker. Boasting a nubuck leather construction in a sleek black hue, the style is defined by the signature Swoosh logo to the side that flaunts the immediately recognisable Tiffany blue hue while A Tiffany & Co. logo patch at the tongue and hallmarked silver embellishments to the rear complete the look.", 3008, 60, 'Nike x Tiffany & Co', 'src/images/sneakers/nike-tiffany-and-co.png'],
-    ['Dunk Low "Lot 50" sneakers', "Virgil Abloh and Nike have teamed up once again for a new iteration of the Dunk Low. In a full-black leather construction and equipped with a metallic silver Swoosh, the pair comes with overlaid rope lacing system from past Off-White™ x Nike Dunk Low collaborations. Also, to finish the look, there's signature silver text on the lateral quarter and a silver Nike Sportswear hit on the heel.", 3242, 60, 'Nike x Off-White', 'src/images/sneakers/nike-offwhite-lot50.png'],
-    ["Travis Scott Air Max 270 'Cactus Trails'", 'The sneaker upper features wavy cream synthetic overlays sitting atop the tonal mesh base while a brown nubuck toe cap with mini embroidered Swoosh branding adds contrast.', 8888, 60, 'Balenciaga', 'src/images/sneakers/travis-scott-cactus.png'],
-    ['SB DUNK LOW “MUMMY”', 'Description for NIKE SB DUNK LOW “MUMMY”', 129.99, 50, 'Nike', 'src/images/sneakers/mummy.png'],
-    ['Yeezy boost Oat', 'Description for Yeezy boost 750', 199.99, 30, 'Yeezy', 'src/images/sneakers/sneaker1.png'],
-    ['Air Jordan University Blue', 'Description for Air Jordan University Blue', 179.99, 40, 'Air Jordan', 'src/images/sneakers/sneaker2.png'],
-    ['SB Dunk', 'Description for SB Dunk', 99.99, 60, 'Adidas', 'src/images/sneakers/dunk.png'],
-    ['Nike Offwhite Vapormax Flyknit', 'Description for SB Dunk', 1000, 60, 'Nike', 'src/images/sneakers/nike-offwhite-vapormax.png']
+    ['3XL Panelled', 'Description for SB Dunk', 3242, 'Balenciaga', 'src/images/sneakers/balenciaga.png'],
+    ['Unicorn low-top', 'Description for SB Dunk', 3242, 'Balmain', 'src/images/sneakers/balmain-unicorn.png'],
+    ['Tiffany and Co Air Force 1 Low sneakers', "Nike teams up with iconic jewellery brand Tiffany & Co. to produce an eye-catching update to the classic Air Force 1 Low sneaker. Boasting a nubuck leather construction in a sleek black hue, the style is defined by the signature Swoosh logo to the side that flaunts the immediately recognisable Tiffany blue hue while A Tiffany & Co. logo patch at the tongue and hallmarked silver embellishments to the rear complete the look.", 3008, 'Nike x Tiffany & Co', 'src/images/sneakers/nike-tiffany-and-co.png'],
+    ['Dunk Low "Lot 50" sneakers', "Virgil Abloh and Nike have teamed up once again for a new iteration of the Dunk Low. In a full-black leather construction and equipped with a metallic silver Swoosh, the pair comes with overlaid rope lacing system from past Off-White™ x Nike Dunk Low collaborations. Also, to finish the look, there's signature silver text on the lateral quarter and a silver Nike Sportswear hit on the heel.", 3242, 'Nike x Off-White', 'src/images/sneakers/nike-offwhite-lot50.png'],
+    ["Travis Scott Air Max 270 'Cactus Trails'", 'The sneaker upper features wavy cream synthetic overlays sitting atop the tonal mesh base while a brown nubuck toe cap with mini embroidered Swoosh branding adds contrast.', 8888, 'Balenciaga', 'src/images/sneakers/travis-scott-cactus.png'],
+    ['SB DUNK LOW “MUMMY”', 'Description for NIKE SB DUNK LOW “MUMMY”', 129.99, 'Nike', 'src/images/sneakers/mummy.png'],
+    ['Yeezy boost Oat', 'Description for Yeezy boost 750', 199.99, 'Yeezy', 'src/images/sneakers/sneaker1.png'],
+    ['Air Jordan University Blue', 'Description for Air Jordan University Blue', 179.99, 'Air Jordan', 'src/images/sneakers/sneaker2.png'],
+    ['SB Dunk', 'Description for SB Dunk', 99.99, 'Adidas', 'src/images/sneakers/dunk.png'],
+    ['Nike Offwhite Vapormax Flyknit', 'Description for SB Dunk', 1000, 'Nike', 'src/images/sneakers/nike-offwhite-vapormax.png']
 ];
 
 foreach ($products as $productData) {
-    list($productName, $description, $price, $stockQuantity, $categoryName, $imageFile) = $productData;
+    list($productName, $description, $price, $categoryName, $imageFile) = $productData;
 
     // Retrieve the categoryId based on the categoryName
     $categoryId = $category->getCategoryIdByName($categoryName);
 
     if ($categoryId !== null) {
         // Create the product with the retrieved categoryId
-        $product->createProduct($productName, $description, $price, $stockQuantity, (int) $categoryId, $imageFile);
+        $productId = $product->createProduct($productName, $description, $price, (int) $categoryId, $imageFile);
+
+        if ($productId !== null) {
+            $dummySizes = ["7", "8", "9", "10", "11", "12", "13"];
+
+            $quantityPerSize = 5;
+
+            foreach ($dummySizes as $size) {
+                $productSize->create($productId, $size, $quantityPerSize);
+            }
+        } else {
+            echo "Error creating product '$productName' . <br> ";
+        }
     } else {
         echo "Error: Category '$categoryName' does not exist.<br>";
     }
@@ -154,6 +186,3 @@ foreach ($products as $productData) {
 
 
 $databaseConnection->closeConnection();
-$conn->close();
-
-?>

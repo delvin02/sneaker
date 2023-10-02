@@ -6,7 +6,15 @@ $databaseConnection = new DatabaseConnection();
 
 $product = new Product($databaseConnection);
 
-$limitedProducts = $product->getProductsLimited(10);
+
+if (isset($_GET['q'])) {
+  $searchQuery = filter_var($_GET['q'], FILTER_SANITIZE_STRING);
+
+  // Search for products based on the query
+  $limitedProducts = $product->searchProducts($searchQuery);
+} else {
+  $limitedProducts = $product->getProductsLimited(10);
+}
 
 ?>
 <section>
@@ -26,17 +34,14 @@ $limitedProducts = $product->getProductsLimited(10);
     <div class="w-1/4 mt-8 xs:w-full">
       <label for="Search" class="sr-only"> Search </label>
 
-      <input type="text" id="Search" placeholder="Search for..."
-        class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm" />
+      <input type="text" id="searchInput" placeholder="Search for..." class="w-full rounded-md border-gray-200 py-2.5 pe-10 shadow-sm sm:text-sm" />
 
       <span class="absolute inset-y-0 end-0 grid w-10 place-content-center">
         <button type="button" class="text-gray-600 hover:text-gray-700">
           <span class="sr-only">Search</span>
 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="h-4 w-4">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
         </button>
       </span>
@@ -45,12 +50,10 @@ $limitedProducts = $product->getProductsLimited(10);
 
       <div class="block sm:hidden">
 
-        <button
-          class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
+        <button class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
           <span class="text-sm font-medium"> Filters & Sorting </span>
 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="h-4 w-4 rtl:rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 rtl:rotate-180">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
         </button>
@@ -59,13 +62,11 @@ $limitedProducts = $product->getProductsLimited(10);
       <div class="hidden sm:flex sm:gap-4">
         <div class="relative">
           <details class="group [&_summary::-webkit-details-marker]:hidden">
-            <summary
-              class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
+            <summary class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
               <span class="text-sm font-medium"> Availability </span>
 
               <span class="transition group-open:-rotate-180">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="h-4 w-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </span>
@@ -119,13 +120,11 @@ $limitedProducts = $product->getProductsLimited(10);
 
         <div class="relative">
           <details class="group [&_summary::-webkit-details-marker]:hidden">
-            <summary
-              class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
+            <summary class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600">
               <span class="text-sm font-medium"> Price </span>
 
               <span class="transition group-open:-rotate-180">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="h-4 w-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </span>
@@ -148,15 +147,13 @@ $limitedProducts = $product->getProductsLimited(10);
                     <label for="FilterPriceFrom" class="flex items-center gap-2">
                       <span class="text-sm text-gray-600">$</span>
 
-                      <input type="number" id="FilterPriceFrom" placeholder="From"
-                        class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                      <input type="number" id="FilterPriceFrom" placeholder="From" class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm" />
                     </label>
 
                     <label for="FilterPriceTo" class="flex items-center gap-2">
                       <span class="text-sm text-gray-600">$</span>
 
-                      <input type="number" id="FilterPriceTo" placeholder="To"
-                        class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                      <input type="number" id="FilterPriceTo" placeholder="To" class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm" />
                     </label>
                   </div>
                 </div>
@@ -180,28 +177,50 @@ $limitedProducts = $product->getProductsLimited(10);
     </div>
 
     <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <?php foreach ($limitedProducts as $product): ?>
-        <li class="flex">
-          <a href="" class="flex flex-col justify-between text-center">
-            <img src="<?php echo $product['ImageFile']; ?>" alt=""
-              class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90 lg:h-[220px] h-auto" />
-            <div class="mt-3">
-              <div class="flex flex-col justify-between text-left mt-2 h-full"> <!-- Fixed height for product name -->
-                <p class="text-sm text-gray-500">
-                  <?php echo $product['CategoryName']; ?>
-                </p>
-                <p class="text-sm h-[40px]">
-                  <?php echo $product['ProductName']; ?>
-                </p>
-                <p class="text-lg font-bold">A$
-                  <?php echo $product['Price']; ?>
-                </p>
+      <?php if (empty($limitedProducts)) : ?>
+        <p class="text-2xl font-bold text-red-500">No products found</p>
+      <?php else : ?>
+        <?php foreach ($limitedProducts as $product) : ?>
+          <li class="flex">
+            <a href="index.php?page=product&product_id=<?php echo $product['ProductId']; ?>" class="flex flex-col justify-between text-center">
+              <img src="<?php echo $product['ImageFile']; ?>" alt="" class="object-cover w-full transition duration-500 aspect-square group-hover:opacity-90 lg:h-[220px] h-auto" />
+              <div class="mt-3">
+                <div class="flex flex-col justify-between text-left mt-2 h-full"> <!-- Fixed height for product name -->
+                  <p class="text-sm text-gray-500">
+                    <?php echo $product['CategoryName']; ?>
+                  </p>
+                  <p class="text-sm h-[40px]">
+                    <?php echo $product['ProductName']; ?>
+                  </p>
+                  <p class="text-lg font-bold">A$
+                    <?php echo $product['Price']; ?>
+                  </p>
+                </div>
               </div>
-            </div>
-          </a>
-        </li>
-      <?php endforeach; ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      <?php endif; ?>
 
     </ul>
   </div>
 </section>
+
+<script>
+  // Get a reference to the input element
+  const searchInput = document.getElementById('searchInput');
+
+  // Add an event listener for keyup events
+  searchInput.addEventListener('keyup', function(event) {
+    // Check if the Enter key (key code 13) is pressed
+    if (event.key === 'Enter') {
+      // Get the user's query
+      const query = searchInput.value.trim();
+
+      // Redirect to the search results page with the query as a parameter
+      if (query) {
+        window.location.href = `index.php?page=products&q=${encodeURIComponent(query)}`;
+      }
+    }
+  });
+</script>
