@@ -211,6 +211,41 @@ class Product
 
         return [];
     }
+
+    public function getRandomProductsLimited($limit = 5)
+    {
+        $sql = "SELECT p.*, c.CategoryName 
+                FROM Product p
+                LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+                ORDER BY RAND()
+                LIMIT ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $limit);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $products = [];
+
+                while ($row = $result->fetch_assoc()) {
+                    $products[] = $row;
+                }
+
+                return $products;
+            } else {
+                echo "Error executing query: " . $stmt->error . "<br>";
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error . "<br>";
+        }
+
+        return [];
+    }
+
     public function searchProducts($query)
     {
         // Use a prepared statement to search for products based on the query
@@ -402,6 +437,40 @@ class CartItem
 
     }
 
+    public function getCartItemsByUserId($userId)
+    {
+        $sql = "SELECT ci.CartItemId, p.ProductName, ps.Size, ci.Quantity, p.Description, p.Price, p.ImageFile
+            FROM CartItem ci
+            INNER JOIN ProductSize ps ON ci.ProductSizeId = ps.ProductSizeId
+            INNER JOIN Product p ON ci.ProductId = p.ProductId
+            WHERE ci.UserId = ?";
+
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $userId);
+
+            if ($stmt->execute()) {
+                $result = $stmt->get_result();
+                $cartItems = array();
+
+                while ($row = $result->fetch_assoc()) {
+                    $cartItems[] = $row;
+                }
+
+                return $cartItems;
+            } else {
+                echo "Error retrieving cart items for the user: " . $stmt->error;
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing statement: " . $this->DatabaseConnection->error;
+        }
+
+        return array(); 
+    }
+
     public function getCartItemByUserProduct($userId, $productId, $productSizeId, $size)
     {
         $sql = "SELECT * FROM CartItem WHERE UserId = ? AND ProductId = ? AND ProductSizeId = ?";
@@ -463,6 +532,27 @@ class CartItem
 
         return false;
     }
+    public function delete($cartItemId)
+    {
+        $sql = "DELETE FROM CartItem WHERE CartItemId = ?";
+        $stmt = $this->DatabaseConnection->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("i", $cartItemId);
+
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                echo "Error deleting cart item: " . $stmt->error;
+            }
+
+            $stmt->close();
+        } else {
+            echo "Error preparing delete statement: " . $this->DatabaseConnection->error;
+        }
+
+        return false;
+    }
 
     public function updateQuantity($cartItemId, $newQuantity)
     {
@@ -486,3 +576,4 @@ class CartItem
         return false;
     }
 }
+?>

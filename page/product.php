@@ -84,7 +84,7 @@ if (isset($_GET['product_id'])) {
                 },
                 success: function(response) {
                     // Handle the response, e.g., show a success message
-                    //window.location.href = "./index.php?page=cart"; // Redirect to the cart page
+                    window.location.href = "./index.php?page=cart"; // Redirect to the cart page
 
                 },
                 error: function(xhr, textStatus, errorThrown) {

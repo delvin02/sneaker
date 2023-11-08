@@ -20,7 +20,7 @@
 
         <ul class="mt-8 flex gap-6">
           <li>
-            <a href="/" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
+            <a href="#" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
               <span class="sr-only">Facebook</span>
 
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,7 +30,7 @@
           </li>
 
           <li>
-            <a href="/" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
+            <a href="#" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
               <span class="sr-only">Instagram</span>
 
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,7 +40,7 @@
           </li>
 
           <li>
-            <a href="/" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
+            <a href="#" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
               <span class="sr-only">Twitter</span>
 
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -50,7 +50,7 @@
           </li>
 
           <li>
-            <a href="/" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
+            <a href="#" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
               <span class="sr-only">GitHub</span>
 
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -60,7 +60,7 @@
           </li>
 
           <li>
-            <a href="/" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
+            <a href="#" rel="noreferrer" target="_blank" class="text-gray-700 transition hover:opacity-75">
               <span class="sr-only">Dribbble</span>
 
               <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -129,7 +129,7 @@
         </ul>
 
         <p class="mt-8 text-xs text-gray-500 sm:mt-0">
-          &copy; 2022. Company Name. All rights reserved.
+          &copy; 2022. EON. All rights reserved.
         </p>
       </div>
     </div>
