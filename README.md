@@ -1,4 +1,4 @@
-![Project Preview](src\images\readme\home.jpg)
+![Project Preview](src/images/readme/home.jpg)
 
 # My Project
 
